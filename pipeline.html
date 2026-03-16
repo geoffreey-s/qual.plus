@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Qualitative Inquiry & Artificial Intelligence | Pipeline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<main class="page">
+
+    <div class="topbar">
+      <a class="brand" href="index.html">Qualitative Inquiry &amp; Artificial Intelligence</a>
+      <nav class="nav">
+        <a href="Overview.html">Overview</a>
+        <a href="pipeline.html" class="active">Pipeline</a>
+        <a href="https://qualitative.plus" target="_blank" rel="noopener noreferrer">QI/AI Index</a>
+        <a href="https://qualitative.plus/article" target="_blank" rel="noopener noreferrer">Article</a>
+        <a href="https://kumu.io/" target="_blank" rel="noopener noreferrer">Bibliographic Map</a>
+      </nav>
+    </div>
+    <section class="hero">
+  <h1>Pipeline</h1>
+  <p class="lead">The research workflow is broken into stages. Each script entry links to its repository path.</p>
+</section>
+
+<section class="section">
+  <div class="stage-card">
+    <div class="section-head">
+      <h2>Corpus Construction</h2>
+      <p>Corpus assembly and initial library export.</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Step</th>
+            <th>Script</th>
+            <th>LLM / API</th>
+            <th>Platform</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+<td>1</td>
+<td><a class="file-link" href="docs/search-strategy.md"><code>—</code></a></td>
+<td>—</td>
+<td>Zotero</td>
+<td>Literature search across 8 databases (Scopus, WoS, PubMed, IEEE Xplore, ACM DL, JSTOR, ProQuest, Google Scholar). Import to Zotero group library. Attach PDFs. Export as QUAL-AI.bib via Better BibTeX.</td>
+</tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="stage-card">
+    <div class="section-head">
+      <h2>Bibliometric Harvesting</h2>
+      <p>Reference harvesting and metadata enrichment from scholarly APIs.</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Step</th>
+            <th>Script</th>
+            <th>LLM / API</th>
+            <th>Platform</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+<td>2</td>
+<td><a class="file-link" href="scripts/01-harvest/harvest_and_enrich.py"><code>harvest_and_enrich.py</code></a></td>
+<td>OpenAlex, Semantic Scholar, Crossref, Unpaywall</td>
+<td>Local</td>
+<td>Two-phase pipeline. Phase 1 (harvest): API cascade for cited reference lists — picks whichever API returns most refs per item. Phase 2 (enrich): 7 passes for OpenAlex concepts/keywords, Semantic Scholar abstracts, Unpaywall OA status, GSCC citation counts, reference metadata merging. WoS/Scopus stubs for institutional API activation. Fully resumable.</td>
+</tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="stage-card">
+    <div class="section-head">
+      <h2>Metadata Enrichment</h2>
+      <p>Supplementary metadata extraction, classification, and Zotero citation repair.</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Step</th>
+            <th>Script</th>
+            <th>LLM / API</th>
+            <th>Platform</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+<td>3a</td>
+<td><a class="file-link" href="scripts/02-metadata/extract_keywords_from_pdfs.py"><code>extract_keywords_from_pdfs.py</code></a></td>
+<td>Claude Sonnet + Zotero API</td>
+<td>Local</td>
+<td>Downloads PDFs from Zotero cloud. Extracts first 2 pages. Sends to Claude to read author-provided keywords exactly as printed. Flags items where publication has no keywords section (N/A). Updates Kumu Excel.</td>
+</tr><tr>
+<td>3b</td>
+<td><a class="file-link" href="scripts/02-metadata/classify_study_type.py"><code>classify_study_type.py</code></a></td>
+<td>Claude Sonnet</td>
+<td>Local</td>
+<td>Classifies each corpus item as Empirical/Applied, Methodological/Technical, or Conceptual/Critical from title + abstract + keywords. Returns confidence scores and one-sentence reasoning per item.</td>
+</tr><tr>
+<td>3c</td>
+<td><a class="file-link" href="scripts/02-metadata/map_venue_disciplines.py"><code>map_venue_disciplines.py</code></a></td>
+<td>—</td>
+<td>Local</td>
+<td>Maps 258 publication venues to 10 discipline categories via deterministic lookup + fuzzy keyword matching. Categories: Health Sciences, Computer Science, Qualitative Methods, Social Sciences, Education, HCI, Business, Communication, Humanities, Interdisciplinary.</td>
+</tr><tr>
+<td>3d</td>
+<td><a class="file-link" href="scripts/02-metadata/update_zotero_citations.py"><code>update_zotero_citations.py</code></a></td>
+<td>OpenAlex, Semantic Scholar, Crossref</td>
+<td>Local</td>
+<td>Repairs missing DOIs via Crossref title lookup. Fetches citation counts from OpenAlex and Semantic Scholar. Writes &quot;Citation Count: N (Source)&quot; into Zotero Extra field. Updates items in-place via Zotero Web API.</td>
+</tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="stage-card">
+    <div class="section-head">
+      <h2>Bibliometrix Assembly</h2>
+      <p>Preparation of bibliometrix-ready master files and WoS-compatible text exports.</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Step</th>
+            <th>Script</th>
+            <th>LLM / API</th>
+            <th>Platform</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+<td>4a</td>
+<td><a class="file-link" href="scripts/03-bibliometrix/build_bibliometrix_master.py"><code>build_bibliometrix_master.py</code></a></td>
+<td>—</td>
+<td>Local</td>
+<td>Reads QUAL-AI.bib + harvested JSON files. Matches by normalized DOI. Injects cited reference lists as CR fields in BibTeX format (WoS convention: LastnameInitials, Year, Venue, DOI). Brace-depth-aware parser handles Better BibTeX nested case protection. Post-write validation for entry count and brace balance.</td>
+</tr><tr>
+<td>4b</td>
+<td><a class="file-link" href="scripts/03-bibliometrix/normalize_cr.py"><code>normalize_cr.py</code></a></td>
+<td>—</td>
+<td>Local</td>
+<td>Cleans all CR field values: strips braces, brackets, quotes, HTML entities. De-duplicates reference strings within each item. Inserts empty CR = {} for items without data so bibliometrix sees a known empty value. Brace-depth-aware field extraction.</td>
+</tr><tr>
+<td>4c</td>
+<td><a class="file-link" href="scripts/03-bibliometrix/convert_to_wos.py"><code>convert_to_wos.py</code></a></td>
+<td>—</td>
+<td>Local</td>
+<td>Converts cleaned BibTeX to WoS plaintext format for R bibliometrix import. Maps fields to WoS tags: AU, TI, SO, DE, AB, DI, CR. Preserves Zotero cite key as UT field for traceability. Sidesteps BibTeX structural incompatibilities (unbraced years, double-brace case protection, Windows paths).</td>
+</tr><tr>
+<td>4d</td>
+<td><a class="file-link" href="scripts/03-bibliometrix/fix_wos_c1.py"><code>fix_wos_c1.py</code></a></td>
+<td>—</td>
+<td>Local</td>
+<td>Patches WoS plaintext with C1 (affiliation) and RP (reprint address) placeholder fields. Required because bibliometrix crashes on zero-length vector when both are entirely absent. Placeholder values are overwritten with NA in R before analysis.</td>
+</tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="stage-card">
+    <div class="section-head">
+      <h2>Corpus Screening</h2>
+      <p>Inclusion and exclusion screening over the assembled corpus.</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Step</th>
+            <th>Script</th>
+            <th>LLM / API</th>
+            <th>Platform</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+<td>5</td>
+<td><a class="file-link" href="scripts/04-screening/screen_corpus.py"><code>screen_corpus.py</code></a></td>
+<td>Claude Sonnet</td>
+<td>Local</td>
+<td>AI-assisted screening of all items against inclusion/exclusion criteria. 7 inclusion types (Applied Research, Methods &amp; Algorithms, Theoretical, Tools &amp; Frameworks, Researcher Perspectives, Reviews &amp; Syntheses, Field Discourse). 6 exclusion types (Traditional Computational, Computational-Only, General AI-Perception, Superficial Mentions, Out of Scope). Per-item decision, confidence, and reasoning trail.</td>
+</tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="stage-card">
+    <div class="section-head">
+      <h2>Keyword Normalization</h2>
+      <p>Normalization of author keywords and Kumu-ready tag fields.</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Step</th>
+            <th>Script</th>
+            <th>LLM / API</th>
+            <th>Platform</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+<td>6</td>
+<td><a class="file-link" href="scripts/05-normalization/clean_kumu_keywords.py"><code>clean_kumu_keywords.py</code></a></td>
+<td>—</td>
+<td>Local</td>
+<td>Deterministic merge rules: expands abbreviations (NLP → Natural Language Processing, LLM → Large Language Models), merges case/plural variants, removes arXiv category tags and off-topic terms. Produces cleaned Kumu Excel with reduced keyword vocabulary.</td>
+</tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="stage-card">
+    <div class="section-head">
+      <h2>Concept Induction</h2>
+      <p>Machine-assisted concept discovery and thematic synthesis.</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Step</th>
+            <th>Script</th>
+            <th>LLM / API</th>
+            <th>Platform</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+<td>7a</td>
+<td><a class="file-link" href="scripts/06-concept-induction/run_lloom.py"><code>run_lloom.py</code></a></td>
+<td>GPT-4o-mini (OpenAI)</td>
+<td>Local</td>
+<td>LLooM unsupervised concept induction on full corpus (title + abstract + keywords as composite text). Rate-limited to 10 req/15s to stay under TPM limits. Generates 14 machine-induced concepts with per-document binary scores and placement rationale. Merges concept scores into Kumu as new columns.</td>
+</tr><tr>
+<td>7b</td>
+<td><a class="file-link" href="scripts/06-concept-induction/claude_synthesis.py"><code>claude_synthesis.py</code></a></td>
+<td>Claude Sonnet</td>
+<td>Local</td>
+<td>Takes LLooM concept clusters (top 60 papers per concept to manage token limits). Sends abstract bundles to Claude with &quot;critical second coder&quot; instructions. Generates 2–3 page thematic narrative synthesis per concept. Outputs markdown files. Inputs to deductive codebook design.</td>
+</tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="stage-card">
+    <div class="section-head">
+      <h2>Corpus Validation</h2>
+      <p>Post-clustering validation and manual thematic review support.</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Step</th>
+            <th>Script</th>
+            <th>LLM / API</th>
+            <th>Platform</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+<td>8</td>
+<td><a class="file-link" href="scripts/07-validation/sort_pdfs_by_theme.py"><code>sort_pdfs_by_theme.py</code></a></td>
+<td>—</td>
+<td>Local</td>
+<td>Parses QUAL-AI.bib to map physical PDF file paths. Copies and renames PDFs from Zotero randomized storage into 14 readable thematic folders on local drive. Enables full-text validation via Google NotebookLM and human review before codebook scoring.</td>
+</tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="stage-card">
+    <div class="section-head">
+      <h2>Deductive Codebook Scoring</h2>
+      <p>Application of the final deductive codebook across the corpus.</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Step</th>
+            <th>Script</th>
+            <th>LLM / API</th>
+            <th>Platform</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+<td>9</td>
+<td><a class="file-link" href="scripts/08-codebook/score_corpus.py"><code>score_corpus.py</code></a></td>
+<td>GPT-4o-mini (OpenAI)</td>
+<td>Local</td>
+<td>Scores every corpus item against validated 26-point binary codebook. 5 domains: Methodology (6 criteria), Human-AI Dynamics (6), Limitations (4), Ethics (7), Prompting (3). Forces strict JSON output. Automated checkpointing against API timeouts. Calculates Primary Domain for Kumu color-coding. Outputs scored Kumu Excel.</td>
+</tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="stage-card">
+    <div class="section-head">
+      <h2>Synchronization</h2>
+      <p>Alignment of Kumu, BibTeX, Zotero, and public-facing facets.</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Step</th>
+            <th>Script</th>
+            <th>LLM / API</th>
+            <th>Platform</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+<td>10a</td>
+<td><a class="file-link" href="scripts/09-sync/pin_zotero_citekeys.py"><code>pin_zotero_citekeys.py</code></a></td>
+<td>Zotero Web API</td>
+<td>Local</td>
+<td>One-time setup: reads Better BibTeX citation keys from QUAL-AI.bib. Matches Zotero items by DOI first, then normalized title+year fallback. Writes &quot;Citation Key: ...&quot; into Extra field. Refuses to guess on conflicts. Dry-run default. Outputs preview, results, conflicts, and error CSVs.</td>
+</tr><tr>
+<td>10b</td>
+<td><a class="file-link" href="scripts/09-sync/sync_kumu_bib_zotero.py"><code>sync_kumu_bib_zotero.py</code></a></td>
+<td>Zotero Web API</td>
+<td>Local</td>
+<td>Kumu-authoritative three-way sync. Parses BibTeX with library-first parser + fallback. Cleans metadata. Uses Kumu as authority for titles and keywords. Updates Zotero (title, tags, DOI, abstract) via Web API with retry/backoff logic. Produces synced Kumu XLSX, cleaned BibTeX, and audit trail CSVs. Dry-run default.</td>
+</tr><tr>
+<td>10c</td>
+<td><a class="file-link" href="scripts/09-sync/setup_facets.py"><code>setup_facets.py</code></a></td>
+<td>Zotero Web API</td>
+<td>Local</td>
+<td>Creates Zotero collection hierarchies for Kerko faceted search. Creates parent collections (Inclusion Category, Discipline, Study Type) with sub-collections for each value. Assigns items to appropriate sub-collections. Outputs config.toml facet blocks with collection keys.</td>
+</tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="stage-card">
+    <div class="section-head">
+      <h2>CR Extraction (LLM)</h2>
+      <p>Fallback extraction of cited references from PDFs when APIs fail.</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Step</th>
+            <th>Script</th>
+            <th>LLM / API</th>
+            <th>Platform</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+<td>11</td>
+<td><a class="file-link" href="scripts/10-network/extract_cr_from_pdfs.py"><code>extract_cr_from_pdfs.py</code></a></td>
+<td>Claude Sonnet + Zotero API</td>
+<td>Local</td>
+<td>For ~100 items where APIs returned no cited references. Downloads PDFs from Zotero cloud. Extracts last 5 pages. Sends to Claude for structured reference list parsing (authors, title, year, venue, DOI per reference). Outputs JSON matching harvest_and_enrich schema. Supports both Claude and Gemini backends.</td>
+</tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="stage-card">
+    <div class="section-head">
+      <h2>Network Construction</h2>
+      <p>Build of Kumu-ready network outputs from the cleaned corpus.</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Step</th>
+            <th>Script</th>
+            <th>LLM / API</th>
+            <th>Platform</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+<td>12</td>
+<td><a class="file-link" href="scripts/10-network/build_kumu_network.py"><code>build_kumu_network.py</code></a></td>
+<td>—</td>
+<td>Local</td>
+<td>Reads QUAL-AI.bib + WoS plaintext. Builds co-citation network entirely in Python (bypasses bibliometrix edge list due to lossy node IDs). Corpus items keyed by Zotero cite key (UT field). External references keyed by 8-char hex hash of normalized CR string. Outputs Kumu elements CSV (nodes with full metadata) and connections CSV (co-citation edges with weights).</td>
+</tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="stage-card">
+    <div class="section-head">
+      <h2>Bibliometric Analysis</h2>
+      <p>Downstream analysis in R and bibliometrix.</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Step</th>
+            <th>Script</th>
+            <th>LLM / API</th>
+            <th>Platform</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+<td>13</td>
+<td><a class="file-link" href="scripts/11-analysis/bibliometrix_analysis.R"><code>R / bibliometrix</code></a></td>
+<td>—</td>
+<td>Local (R)</td>
+<td>Imports bibliometrix_master_wos_fixed.txt into R via convert2df(). Clears placeholder C1/RP fields. Runs biblioAnalysis(), co-citation network extraction, bibliographic coupling, thematic evolution (4 time slices: pre-2023, 2023, 2024, 2025–26), strategic diagrams, and burst detection.</td>
+</tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="stage-card">
+    <div class="section-head">
+      <h2>Web Deployment</h2>
+      <p>Files required to deploy the public bibliography and related web assets.</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Step</th>
+            <th>Script</th>
+            <th>LLM / API</th>
+            <th>Platform</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+<td>14a</td>
+<td><a class="file-link" href="deployment/kerko/config.toml"><code>config.toml</code></a></td>
+<td>—</td>
+<td>PythonAnywhere</td>
+<td>KerkoApp TOML configuration: Zotero library connection, 6 faceted search filters (Study Type, Discipline, Inclusion Category, Keywords, Item Type, Year), navbar links (Index, Project Overview, Kumu Map, Paper), site metadata.</td>
+</tr><tr>
+<td>14b</td>
+<td><a class="file-link" href="deployment/kerko/kerkoapp/__init__.py"><code>__init__.py</code></a></td>
+<td>—</td>
+<td>PythonAnywhere</td>
+<td>Modified KerkoApp factory with CSS injection via after_request handler. White background, black text, sunset orange (#FF6B35) hover accents across all links, buttons, badges, and facet filters.</td>
+</tr><tr>
+<td>14c</td>
+<td><a class="file-link" href="deployment/kerko/kerkoapp/logging.py"><code>logging.py</code></a></td>
+<td>—</td>
+<td>PythonAnywhere</td>
+<td>Fixes PythonAnywhere recursion bug: replaces Flask WSGI error stream (ext://flask.logging.wsgi_errors_stream) with sys.stderr in dictConfig handler. Prevents infinite logging loop caused by PythonAnywhere routing stream.write() back through logger.</td>
+</tr><tr>
+<td>14d</td>
+<td><a class="file-link" href="deployment/kerko/wsgi.py"><code>wsgi.py</code></a></td>
+<td>—</td>
+<td>PythonAnywhere</td>
+<td>PythonAnywhere WSGI entry point: adds project directory and user site-packages to sys.path, sets working directory via os.chdir() for config file discovery, creates Flask application via KerkoApp factory.</td>
+</tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<p class="note">Each stage is separated to make the workflow easier to scan than a single long table.</p>
+</main>
+</body>
+</html>

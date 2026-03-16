@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Qualitative Inquiry & Artificial Intelligence | Overview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<main class="page">
+
+    <div class="topbar">
+      <a class="brand" href="index.html">Qualitative Inquiry &amp; Artificial Intelligence</a>
+      <nav class="nav">
+        <a href="Overview.html" class="active">Overview</a>
+        <a href="pipeline.html">Pipeline</a>
+        <a href="https://qualitative.plus" target="_blank" rel="noopener noreferrer">QI/AI Index</a>
+        <a href="https://qualitative.plus/article" target="_blank" rel="noopener noreferrer">Article</a>
+        <a href="https://kumu.io/" target="_blank" rel="noopener noreferrer">Bibliographic Map</a>
+      </nav>
+    </div>
+    <section class="hero">
+  <h1>Overview</h1>
+  <p class="lead">Project documentation rendered directly from the repository Overview.</p>
+</section>
+
+<section class="section">
+  <div class="content-card">
+    <article class="readme">
+      <h1>Qualitative-AI: A Hybrid Bibliometric Pipeline for Mapping AI in Qualitative Research</h1>
+<p><a href="https://gnsschwarz.pythonanywhere.com/bibliography"><img src="https://img.shields.io/badge/bibliography-live-FF6B35" alt="Kerko" /></a>
+<a href="https://kumu.io/"><img src="https://img.shields.io/badge/network_map-live-39ff14" alt="Kumu" /></a>
+<a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" /></a></p>
+<p>This repository contains the complete replication pipeline for a scoping review of how artificial intelligence — specifically large language models, generative AI, and transformer-based models — is reshaping qualitative research methods.</p>
+<p>The pipeline combines traditional bibliometric methods with LLM-assisted metadata extraction, unsupervised concept induction, and deductive codebook scoring to analyze a corpus of <strong>497 papers</strong> (2010–2026).</p>
+<p><strong>Live outputs:</strong></p>
+<ul>
+<li><a href="https://gnsschwarz.pythonanywhere.com/bibliography">Interactive Bibliography (Kerko)</a> — faceted search across 6 dimensions</li>
+<li><a href="https://kumu.io/">Co-citation Network Map (Kumu)</a> — interactive network visualization</li>
+</ul>
+<hr />
+<h2>Pipeline Overview</h2>
+<pre><code>Zotero Library ──► QUAL-AI.bib ──► harvest_and_enrich.py ──► JSON/item
+                                          │
+     ┌────────────────────────────────────┤
+     ▼                                    ▼
+ extract_keywords    classify_study_type / map_venue_disciplines
+ (Claude + PDFs)     (Claude + abstracts)
+     │                                    │
+     ▼                                    ▼
+ screen_corpus.py ◄── Inclusion/Exclusion Criteria v2
+     │
+     ▼
+ clean_kumu_keywords.py ──► Normalized Kumu dataset
+     │
+     ├──► run_lloom.py ──► 14 machine-induced concepts
+     │         │
+     │         ▼
+     │    claude_synthesis.py ──► Thematic syntheses ──► 26-point codebook
+     │                                                        │
+     │                                                        ▼
+     │                                              score_corpus.py
+     │                                              (GPT-4o-mini)
+     │                                                        │
+     ▼                                                        ▼
+ sync_kumu_bib_zotero.py ◄──────────────────────── Kumu v11 (scored)
+     │
+     ├──► Zotero (updated tags, titles)
+     ├──► QUAL-AI_cleaned.bib
+     └──► Kerko (PythonAnywhere)
+</code></pre>
+<hr />
+<h2>Replication Pipeline</h2>
+<table>
+<thead>
+<tr>
+  <th>Step</th>
+  <th>Research Phase</th>
+  <th>Script</th>
+  <th>LLM / API</th>
+  <th>Platform</th>
+  <th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>1</td>
+  <td>Corpus Construction</td>
+  <td>—</td>
+  <td>—</td>
+  <td>Zotero</td>
+  <td>Literature search across 8 databases. Import to Zotero. Export as <code>QUAL-AI.bib</code> via Better BibTeX.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td>Bibliometric Harvesting</td>
+  <td><a href="scripts/01-harvest/harvest_and_enrich.py"><code>harvest_and_enrich.py</code></a></td>
+  <td>OpenAlex, Semantic Scholar, Crossref</td>
+  <td>Local</td>
+  <td>API cascade for cited references, citation counts, OpenAlex keywords, abstracts, and Unpaywall OA status.</td>
+</tr>
+<tr>
+  <td>3a</td>
+  <td>Metadata Enrichment</td>
+  <td><a href="scripts/02-metadata/extract_keywords_from_pdfs.py"><code>extract_keywords_from_pdfs.py</code></a></td>
+  <td>Claude Sonnet</td>
+  <td>Local</td>
+  <td>Extracts author keywords from PDF first pages via Zotero cloud + Claude. Flags items with no keywords section.</td>
+</tr>
+<tr>
+  <td>3b</td>
+  <td>Metadata Enrichment</td>
+  <td><a href="scripts/02-metadata/classify_study_type.py"><code>classify_study_type.py</code></a></td>
+  <td>Claude Sonnet</td>
+  <td>Local</td>
+  <td>Classifies items as Empirical/Applied, Methodological/Technical, or Conceptual/Critical from abstracts.</td>
+</tr>
+<tr>
+  <td>3c</td>
+  <td>Metadata Enrichment</td>
+  <td><a href="scripts/02-metadata/map_venue_disciplines.py"><code>map_venue_disciplines.py</code></a></td>
+  <td>—</td>
+  <td>Local</td>
+  <td>Maps 258 venues to 10 discipline categories via deterministic rules + fuzzy matching.</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td>Corpus Screening</td>
+  <td><a href="scripts/03-screening/screen_corpus.py"><code>screen_corpus.py</code></a></td>
+  <td>Claude Sonnet</td>
+  <td>Local</td>
+  <td>AI-assisted screening against 7 inclusion and 6 exclusion criteria. Per-item decision, confidence, and reasoning.</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td>Keyword Normalization</td>
+  <td><a href="scripts/04-normalization/clean_kumu_keywords.py"><code>clean_kumu_keywords.py</code></a></td>
+  <td>—</td>
+  <td>Local</td>
+  <td>Deterministic merge rules: expand abbreviations, merge case/plural variants, remove arXiv category tags.</td>
+</tr>
+<tr>
+  <td>6a</td>
+  <td>Concept Induction</td>
+  <td><a href="scripts/05-concept-induction/run_lloom.py"><code>run_lloom.py</code></a></td>
+  <td>GPT-4o-mini</td>
+  <td>Local</td>
+  <td>LLooM unsupervised concept induction on full corpus. 14 concepts with per-document scores.</td>
+</tr>
+<tr>
+  <td>6b</td>
+  <td>Thematic Synthesis</td>
+  <td><a href="scripts/05-concept-induction/claude_synthesis.py"><code>claude_synthesis.py</code></a></td>
+  <td>Claude Sonnet</td>
+  <td>Local</td>
+  <td>Narrative synthesis per LLooM cluster. &quot;Critical second coder&quot; approach. Inputs to codebook design.</td>
+</tr>
+<tr>
+  <td>7</td>
+  <td>Deductive Codebook Scoring</td>
+  <td><a href="scripts/06-codebook/score_corpus.py"><code>score_corpus.py</code></a></td>
+  <td>GPT-4o-mini</td>
+  <td>Local</td>
+  <td>26-point binary codebook across 5 domains (Methodology, Dynamics, Limitations, Ethics, Prompting). Primary Domain assignment.</td>
+</tr>
+<tr>
+  <td>8a</td>
+  <td>Synchronization</td>
+  <td><a href="scripts/07-sync/pin_zotero_citekeys.py"><code>pin_zotero_citekeys.py</code></a></td>
+  <td>Zotero Web API</td>
+  <td>Local</td>
+  <td>One-time setup: pins Better BibTeX citation keys into Zotero Extra field for reliable cross-platform matching.</td>
+</tr>
+<tr>
+  <td>8b</td>
+  <td>Synchronization</td>
+  <td><a href="scripts/07-sync/sync_kumu_bib_zotero.py"><code>sync_kumu_bib_zotero.py</code></a></td>
+  <td>Zotero Web API</td>
+  <td>Local</td>
+  <td>Kumu-authoritative three-way sync: Kumu → BibTeX → Zotero. Dry-run default. Full audit trail.</td>
+</tr>
+<tr>
+  <td>8c</td>
+  <td>Synchronization</td>
+  <td><a href="scripts/07-sync/setup_facets.py"><code>setup_facets.py</code></a></td>
+  <td>Zotero Web API</td>
+  <td>Local</td>
+  <td>Creates Zotero collection hierarchies for Kerko faceted search (Inclusion, Discipline, Study Type).</td>
+</tr>
+<tr>
+  <td>9</td>
+  <td>Cited Reference Extraction</td>
+  <td><a href="scripts/08-network/extract_cr_from_pdfs.py"><code>extract_cr_from_pdfs.py</code></a></td>
+  <td>Claude Sonnet</td>
+  <td>Local</td>
+  <td>LLM extraction of reference lists from PDF last pages for ~100 items where APIs returned nothing.</td>
+</tr>
+<tr>
+  <td>10</td>
+  <td>Network Construction</td>
+  <td><a href="scripts/08-network/build_cocitation_network.py"><code>build_cocitation_network.py</code></a></td>
+  <td>—</td>
+  <td>Local</td>
+  <td>Builds co-citation and bibliographic coupling edge lists. Outputs Kumu-formatted network data.</td>
+</tr>
+<tr>
+  <td>11</td>
+  <td>Web Deployment</td>
+  <td><a href="deployment/kerko/">Kerko config</a></td>
+  <td>—</td>
+  <td>PythonAnywhere</td>
+  <td>KerkoApp with custom CSS, 6 facets, WSGI configuration, PythonAnywhere logging fixes.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>Repository Structure</h2>
+<pre><code>Qualitative-AI/
+├── README.md
+├── LICENSE
+├── data/
+│   ├── QUAL-AI.bib                          # Master bibliography (Better BibTeX export)
+│   ├── Kumu_v11.xlsx                        # Master dataset (Kumu authority)
+│   ├── inclusion_exclusion_criteria.xlsx     # Screening criteria (v2)
+│   └── lloom/
+│       ├── lloom_concepts_unified.csv        # 14 induced concepts
+│       ├── lloom_scores_raw_unified.csv      # Per-document concept scores
+│       └── thematic_syntheses/               # Claude-generated narrative syntheses
+├── scripts/
+│   ├── 01-harvest/
+│   │   ├── harvest_and_enrich.py
+│   │   └── README.md
+│   ├── 02-metadata/
+│   │   ├── extract_keywords_from_pdfs.py
+│   │   ├── classify_study_type.py
+│   │   ├── map_venue_disciplines.py
+│   │   └── README.md
+│   ├── 03-screening/
+│   │   ├── screen_corpus.py
+│   │   └── README.md
+│   ├── 04-normalization/
+│   │   ├── clean_kumu_keywords.py
+│   │   └── README.md
+│   ├── 05-concept-induction/
+│   │   ├── run_lloom.py
+│   │   ├── claude_synthesis.py
+│   │   └── README.md
+│   ├── 06-codebook/
+│   │   ├── score_corpus.py
+│   │   └── README.md
+│   ├── 07-sync/
+│   │   ├── pin_zotero_citekeys.py
+│   │   ├── sync_kumu_bib_zotero.py
+│   │   ├── setup_facets.py
+│   │   └── README.md
+│   └── 08-network/
+│       ├── extract_cr_from_pdfs.py
+│       ├── build_cocitation_network.py
+│       └── README.md
+├── deployment/
+│   └── kerko/
+│       ├── config.toml
+│       ├── wsgi.py
+│       ├── kerkoapp/
+│       │   ├── __init__.py
+│       │   └── logging.py
+│       └── README.md
+└── docs/
+    ├── search-strategy.md
+    ├── codebook.md
+    └── VERSION_AND_STATUS.md
+</code></pre>
+<hr />
+<h2>Corpus Statistics</h2>
+<table>
+<thead>
+<tr>
+  <th>Metric</th>
+  <th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Total items</td>
+  <td>497</td>
+</tr>
+<tr>
+  <td>Date range</td>
+  <td>2010–2026</td>
+</tr>
+<tr>
+  <td>With abstracts</td>
+  <td>497 (100%)</td>
+</tr>
+<tr>
+  <td>With author keywords</td>
+  <td>425 (85%)</td>
+</tr>
+<tr>
+  <td>With discipline classification</td>
+  <td>467 (94%)</td>
+</tr>
+<tr>
+  <td>With study type classification</td>
+  <td>467 (94%)</td>
+</tr>
+<tr>
+  <td>With 26-point codebook scores</td>
+  <td>467 (94%)</td>
+</tr>
+<tr>
+  <td>With LLooM concept scores</td>
+  <td>497 (100%)</td>
+</tr>
+<tr>
+  <td>LLooM concepts induced</td>
+  <td>14</td>
+</tr>
+<tr>
+  <td>Codebook domains</td>
+  <td>5 (26 binary criteria)</td>
+</tr>
+<tr>
+  <td>Kerko facets</td>
+  <td>6</td>
+</tr>
+<tr>
+  <td>Discipline categories</td>
+  <td>10</td>
+</tr>
+<tr>
+  <td>Inclusion types</td>
+  <td>7</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>Technology Stack</h2>
+<table>
+<thead>
+<tr>
+  <th>Component</th>
+  <th>Technology</th>
+  <th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Reference management</td>
+  <td>Zotero + Better BibTeX</td>
+  <td>Corpus construction, PDF storage, metadata</td>
+</tr>
+<tr>
+  <td>Bibliometric APIs</td>
+  <td>OpenAlex, Semantic Scholar, Crossref, Unpaywall</td>
+  <td>Cited references, citation counts, keywords, OA status</td>
+</tr>
+<tr>
+  <td>LLM (structured extraction)</td>
+  <td>Claude Sonnet 4 (Anthropic)</td>
+  <td>Keyword extraction, study type classification, screening, CR extraction, thematic synthesis</td>
+</tr>
+<tr>
+  <td>LLM (concept induction)</td>
+  <td>GPT-4o-mini (OpenAI) via LLooM</td>
+  <td>Unsupervised concept clustering, codebook scoring</td>
+</tr>
+<tr>
+  <td>Network visualization</td>
+  <td>Kumu</td>
+  <td>Interactive co-citation and bibliographic coupling maps</td>
+</tr>
+<tr>
+  <td>Web bibliography</td>
+  <td>KerkoApp (Flask) on PythonAnywhere</td>
+  <td>Public faceted search interface</td>
+</tr>
+<tr>
+  <td>Data authority</td>
+  <td>Kumu Excel → Zotero → BibTeX</td>
+  <td>Three-way synchronization pipeline</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>Replication Requirements</h2>
+<pre><code class="language-bash">pip install pyzotero anthropic openai openpyxl pypdf bibtexparser requests tqdm text_lloom python-dotenv
+</code></pre>
+<p>API keys needed:</p>
+<ul>
+<li>Anthropic API key (Claude) — for Steps 3a, 3b, 4, 6b, 9</li>
+<li>OpenAI API key (GPT-4o-mini) — for Steps 6a, 7</li>
+<li>Zotero API key — for Steps 8a, 8b, 8c</li>
+</ul>
+<hr />
+<h2>Citation</h2>
+<p>Schwarzenbach, G. (2026). <em>AI in Qualitative Research: A Hybrid Bibliometric and Depth Analysis</em>. University of Houston, Foresight Program. Independent Study.</p>
+<hr />
+<h2>License</h2>
+<p>MIT License. See <a href="LICENSE">LICENSE</a> for details.</p>
+
+    </article>
+  </div>
+</section>
+
+</main>
+</body>
+</html>

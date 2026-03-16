@@ -1,0 +1,119 @@
+:root{
+  --bg:#000000;
+  --panel:#080808;
+  --panel-2:#0f0f0f;
+  --line:#1a1a1a;
+  --ink:#f5f5f0;
+  --muted:#9e9e9a;
+  --soft:#cfcfc8;
+  --accent:#ff7a45;
+  --accent-soft:#ffb08f;
+  --shadow:0 18px 60px rgba(0,0,0,.45);
+  --radius:24px;
+  --max:1180px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+::selection{background:rgba(255,122,69,.28);color:var(--ink)}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  line-height:1.55;
+}
+a{
+  color:inherit;
+  text-decoration:none;
+  transition:color .18s ease,opacity .18s ease,text-decoration-color .18s ease;
+}
+a:hover{color:var(--accent)}
+.page{width:min(var(--max),calc(100vw - 32px));margin:0 auto;padding:28px 0 80px}
+.topbar{
+  display:flex;justify-content:space-between;align-items:center;gap:16px;
+  padding:10px 2px 28px;flex-wrap:wrap;
+}
+.brand{
+  font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);text-decoration:none;
+}
+.brand:hover{color:var(--accent)}
+.nav{display:flex;gap:18px;flex-wrap:wrap}
+.nav a{
+  color:var(--soft);
+  font-size:.96rem;
+  font-weight:500;
+  text-decoration:none;
+}
+.nav a:hover,
+.nav a.active{
+  color:var(--accent);
+}
+.hero{padding:8px 2px 22px;display:grid;gap:14px}
+h1{
+  margin:0;
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size:clamp(2.15rem,4.4vw,3.45rem);
+  line-height:1;
+  font-weight:650;
+  letter-spacing:-.04em;
+  max-width:16ch
+}
+.lead{max-width:760px;color:#d8d8d2;font-size:1.03rem}
+.section{margin-top:26px}
+.stage-card,.content-card{
+  border:1px solid var(--line);border-radius:28px;background:linear-gradient(180deg,rgba(18,18,18,.96),rgba(9,9,9,.99));
+  box-shadow:var(--shadow);overflow:hidden
+}
+.section-head{
+  padding:20px 24px 14px;border-bottom:1px solid var(--line);
+  background:linear-gradient(180deg,rgba(19,19,19,.9),rgba(10,10,10,.98))
+}
+.section-head h2{margin:0;font-size:1.15rem;font-weight:620;letter-spacing:-.02em}
+.section-head p{margin:6px 0 0;color:var(--muted);font-size:.92rem;max-width:840px}
+.table-wrap{overflow:auto;background:var(--panel)}
+table{width:100%;border-collapse:separate;border-spacing:0;min-width:980px;font-size:.94rem}
+thead th{
+  position:sticky;top:0;z-index:2;text-align:left;background:#0f0f0f;color:#f4f4ee;
+  padding:14px 16px;border-bottom:1px solid var(--line);font-size:.81rem;text-transform:uppercase;letter-spacing:.08em
+}
+tbody td{
+  padding:14px 16px;border-bottom:1px solid #151515;vertical-align:top;background:#090909;color:#ecece6
+}
+tbody tr:hover td{background:#101010}
+tbody td:first-child, thead th:first-child{padding-left:22px}
+tbody td:last-child, thead th:last-child{padding-right:22px}
+.file-link{
+  color:#fff;text-decoration:underline;text-underline-offset:3px;text-decoration-color:#383838
+}
+.file-link:hover{color:var(--accent);text-decoration-color:var(--accent)}
+code{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.92em;
+  background:#111;border:1px solid #1d1d1d;border-radius:8px;padding:2px 6px
+}
+.readme{
+  padding:30px 30px 40px;background:linear-gradient(180deg,#0b0b0b,#070707)
+}
+.readme h1,.readme h2,.readme h3,.readme h4{
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  max-width:none;letter-spacing:-.02em;line-height:1.15;font-weight:650
+}
+.readme h1{font-size:1.9rem}
+.readme h2{font-size:1.3rem;margin-top:1.5em}
+.readme h3{font-size:1.07rem;margin-top:1.25em}
+.readme p,.readme li{max-width:900px;color:#ecece7}
+.readme a{color:var(--accent-soft);text-decoration:underline;text-underline-offset:3px}
+.readme a:hover{color:var(--accent)}
+.readme pre{
+  overflow:auto;padding:14px 16px;border-radius:14px;background:#0f0f0f;border:1px solid var(--line)
+}
+.readme code{background:#111}
+.readme table{min-width:0;border-collapse:collapse}
+.readme table th,.readme table td{
+  position:static;border:1px solid var(--line);padding:10px 12px;text-align:left;vertical-align:top;background:transparent
+}
+.readme hr{border:none;border-top:1px solid var(--line);margin:30px 0}
+.note{padding:18px 2px 0;color:var(--muted);font-size:.9rem}
+@media (max-width:780px){
+  .page{width:min(var(--max),calc(100vw - 18px));padding-top:18px}
+  .section-head,.readme{padding-left:16px;padding-right:16px}
+  tbody td:first-child,thead th:first-child{padding-left:16px}
+  tbody td:last-child,thead th:last-child{padding-right:16px}
+}
